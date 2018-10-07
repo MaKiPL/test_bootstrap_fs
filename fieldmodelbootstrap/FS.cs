@@ -30,6 +30,7 @@ namespace fieldmodelbootstrap
             string flPath = Path.Combine(Path.GetDirectoryName(path), $"{Path.GetFileNameWithoutExtension(Path.GetFullPath(path))}.fl");
             if (!File.Exists(fiPath) || !File.Exists(flPath)) throw new FileNotFoundException();
             ReadSuppliers(fiPath, flPath);
+
         }
 
         private void ReadSuppliers(string fiPath_, string flPath_)

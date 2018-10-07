@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace fieldmodelbootstrap
 {
-    class Program : System.Windows.Forms.Form
+    public partial class Form1 : Form
     {
-        [STAThread]
-        static void Main()
+        public Form1()
         {
-            Application.EnableVisualStyles();
-            Application.Run(new Form1());
+            InitializeComponent();
         }
     }
 }

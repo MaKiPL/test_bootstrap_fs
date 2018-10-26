@@ -13,7 +13,7 @@ namespace fieldmodelbootstrap
         /// </summary>
         /// <param name="data">buffer</param>
         /// <param name="fileSize">Original filesize of compressed file</param>
-        /// <param name="size">Filesize of final file</param>
+        /// <param name="size">Filesize of final uncompressed file</param>
         /// <returns>Byte array</returns>
         public static byte[] DecompressAll(byte[] data, uint fileSize, int size = 0)
         {

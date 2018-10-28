@@ -17,6 +17,15 @@ namespace fieldmodelbootstrap
         public static string[] ConvertBufferToStringArray(byte[] buffer, Encoding enc)
 => enc.GetString(buffer).Split(new char[] { '\0', '\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
 
+        public static string getFilename_dirty(string s, char delimiter = '\\')=>
+            s.Substring(s.LastIndexOf(delimiter)+1);
 
+        public static string getFilename_dirty_withoutExtension(string s, char delimiter = '\\') 
+        {
+            string delimited = getFilename_dirty(s, delimiter);
+            if (delimited.Contains('.'))
+                return delimited.Substring(0, delimited.LastIndexOf('.'));
+            else return delimited;
+        }
     }
 }

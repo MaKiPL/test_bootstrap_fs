@@ -25,10 +25,15 @@ namespace fieldmodelbootstrap
                 toolStripStatusLabel1.Text = "Bad field.fs";
                 return;
             }
+            //string[] FsFiles = fs.GetFileList().Select(x => MakiExtended.getFilename_dirty(x).EndsWith(".fs",StringComparison.CurrentCulture)).ToArray();
+            List<string> FsFiles = (from a in fs.GetFileList() where a.EndsWith(".fs") select MakiExtended.getFilename_dirty_withoutExtension(a)).ToList();
             FS mapData = fs.GetArchive(fs.FindFile("mapdata.fs"));
-            listBox1.DataSource = MakiExtended.ConvertBufferToStringArray(mapData.GetFile(mapData.FindFile("maplist")),Encoding.UTF8);
+            string[] maplistFileList = MakiExtended.ConvertBufferToStringArray(mapData.GetFile(mapData.FindFile("maplist")),Encoding.UTF8);
+            foreach (string s in FsFiles) //change to for, because System.InvalidOperationException: Collection was modified; enumeration operation may not execute. after modify of list. Seems logical
+                if (!maplistFileList.Contains(s)) ;
+                    FsFiles.RemoveAt(FsFiles.IndexOf(s)); //mono crashes here, why?
+            listBox1.DataSource = FsFiles;
             toolStripStatusLabel1.Text = $"FS ready at : {listBox1.Items.Count} entries";
-
         }
     }
 }

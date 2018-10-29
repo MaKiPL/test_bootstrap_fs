@@ -103,6 +103,7 @@
             this.listBox1.Name = "listBox1";
             this.listBox1.Size = new System.Drawing.Size(266, 404);
             this.listBox1.TabIndex = 0;
+            this.listBox1.SelectedIndexChanged += ListBox1_SelectedIndexChanged;
             // 
             // Form1
             // 
@@ -136,5 +137,6 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.ListBox listBox1;
+
     }
 }

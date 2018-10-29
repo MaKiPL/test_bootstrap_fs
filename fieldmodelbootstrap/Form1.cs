@@ -12,6 +12,8 @@ namespace fieldmodelbootstrap
 {
     public partial class Form1 : Form
     {
+        FS fs;
+
         public Form1()
         {
             InitializeComponent();
@@ -19,7 +21,7 @@ namespace fieldmodelbootstrap
 
         private void openFieldfsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            FS fs = new FS();
+            fs = new FS();
             if(fs.FSarch.Count < 1)
             {
                 toolStripStatusLabel1.Text = "Bad field.fs";
@@ -29,11 +31,27 @@ namespace fieldmodelbootstrap
             List<string> FsFiles = (from a in fs.GetFileList() where a.EndsWith(".fs") select MakiExtended.getFilename_dirty_withoutExtension(a)).ToList();
             FS mapData = fs.GetArchive(fs.FindFile("mapdata.fs"));
             string[] maplistFileList = MakiExtended.ConvertBufferToStringArray(mapData.GetFile(mapData.FindFile("maplist")),Encoding.UTF8);
-            foreach (string s in FsFiles) //change to for, because System.InvalidOperationException: Collection was modified; enumeration operation may not execute. after modify of list. Seems logical
-                if (!maplistFileList.Contains(s)) ;
-                    FsFiles.RemoveAt(FsFiles.IndexOf(s)); //mono crashes here, why?
+            for (int i = 0; i < FsFiles.Count; i++)
+                if (!maplistFileList.Contains(FsFiles[i]))
+                {
+                    FsFiles.RemoveAt(FsFiles.IndexOf(FsFiles[i]));
+                    i--;
+                }
             listBox1.DataSource = FsFiles;
             toolStripStatusLabel1.Text = $"FS ready at : {listBox1.Items.Count} entries";
+        }
+
+        void ListBox1_SelectedIndexChanged(object sender, System.EventArgs e)
+        {
+            ListBox send = sender as ListBox;
+            if (send.Items.Count < 1) return;
+            string s = send.SelectedValue as string;
+            string path = fs.FindFile(s);
+            if (string.IsNullOrWhiteSpace(path)) 
+                return;
+            FS map = fs.GetArchive(path);
+            byte[] chara = map.GetFile(map.FindFile("chara.one"));
+
         }
     }
 }

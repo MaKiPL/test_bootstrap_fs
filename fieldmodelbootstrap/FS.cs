@@ -54,21 +54,7 @@ namespace fieldmodelbootstrap
                 for (int i = 0; i < filesList.Length; i++)
                 {
                     FSarch.Add(filesList[i], new FI() { Entry = (uint)i, LengthOfUnpackedFile = br.ReadUInt32(), LocationInFS = br.ReadUInt32(), LZSS = br.ReadUInt32() });
-                    if (i < filesList.Length - 1)
-                    {
-                        //dirty
-                        fs.Seek(4, SeekOrigin.Current);
-                        if (i < 1)
-                            FsFileLength.Add(br.ReadUInt32());
-                        else
-                            FsFileLength.Add(br.ReadUInt32() - FSarch.Last().Value.LocationInFS);
-                        fs.Seek(-8, SeekOrigin.Current);
-                    }
-                    else //last
-                    {
-                        fs.Seek(-8, SeekOrigin.Current);
-                        FsFileLength.Add((uint)fsBuffer.Length-br.ReadUInt32()); //Microsoft's FS size in int instead of uint ;-;
-                    }
+                    FsFileLength.Add(BitConverter.ToUInt32(fsBuffer, (int)FSarch.Last().Value.LocationInFS) + 4);
                 }
         }
 
@@ -84,31 +70,35 @@ namespace fieldmodelbootstrap
                 if (string.IsNullOrWhiteSpace(filesList[i])) continue;
                 FSarch.Add(filesList[i], new FI() { Entry = (uint)i, LengthOfUnpackedFile = BitConverter.ToUInt32(fiPath_, (int)fsIndex), LocationInFS = BitConverter.ToUInt32(fiPath_, (int)fsIndex+4), LZSS = BitConverter.ToUInt32(fiPath_, (int)fsIndex+8) });
                 fsIndex += 12;
-                if (i < filesList.Length - 1 && fiPath_.Length != 12)
-                    //dirty
-                    if (i < 1)
-                        FsFileLength.Add(BitConverter.ToUInt32(fiPath_, (int)fsIndex + 4));
-                    else
-                        FsFileLength.Add(BitConverter.ToUInt32(fiPath_, (int)fsIndex + 4) - FsFileLength.Last());
-                else //last
-                    FsFileLength.Add((uint)fsBuffer.Length - BitConverter.ToUInt32(fiPath_, (int)fsIndex - 8)); //Microsoft's FS size in int instead of uint ;-;
-                }
+                FsFileLength.Add(BitConverter.ToUInt32(fsBuffer, (int)FSarch.Last().Value.LocationInFS) + 4);
+            }
         }
 
         public byte[] GetFile(string filename)
         {
             FI myFI = FSarch[filename.ToLower()];
-            byte[] fileBuffer = new byte[FsFileLength[(int)myFI.Entry]];
-            Array.Copy(fsBuffer, myFI.LocationInFS, fileBuffer, 0, fileBuffer.Length);
-            if(myFI.LZSS==1)
+
+
+            if (myFI.LZSS == 1)
             {
+                byte[] fileBuffer = new byte[FsFileLength[(int)myFI.Entry]];
+                Array.Copy(fsBuffer, myFI.LocationInFS, fileBuffer, 0, fileBuffer.Length);
                 return LZSS.DecompressAll(fileBuffer, (uint)fileBuffer.Length, (int)myFI.LengthOfUnpackedFile);
             }
-            return fileBuffer;
+            else
+            {
+                byte[] fileBuffer = new byte[myFI.LengthOfUnpackedFile];
+                Array.Copy(fsBuffer, myFI.LocationInFS, fileBuffer, 0, fileBuffer.Length);
+                return fileBuffer;
+            }
         }
 
         public string FindFile(string filenamePart)
-=> (from ar in GetFileList() where ar.Contains(filenamePart) select ar).First();
+        {
+            var b = (from ar in GetFileList() where ar.Contains(filenamePart) select ar);
+            if (b.Count() > 0) return b.First();
+            else return "ERR_ERR_ERR";
+        }
         
 
         public string[] GetFileList()
@@ -122,6 +112,7 @@ namespace fieldmodelbootstrap
                 GetFile($"{noExt}fi"),
                 GetFile($"{noExt}fl")
                 ); 
+            
         }
     }
 }

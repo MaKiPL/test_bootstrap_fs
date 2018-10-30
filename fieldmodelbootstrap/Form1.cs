@@ -13,6 +13,7 @@ namespace fieldmodelbootstrap
     public partial class Form1 : Form
     {
         FS fs;
+        FS map;
 
         public Form1()
         {
@@ -43,14 +44,21 @@ namespace fieldmodelbootstrap
 
         void ListBox1_SelectedIndexChanged(object sender, System.EventArgs e)
         {
+            
             ListBox send = sender as ListBox;
             if (send.Items.Count < 1) return;
             string s = send.SelectedValue as string;
             string path = fs.FindFile(s);
             if (string.IsNullOrWhiteSpace(path)) 
                 return;
-            FS map = fs.GetArchive(path);
-            byte[] chara = map.GetFile(map.FindFile("chara.one"));
+            map = fs.GetArchive(path);
+
+            GC.Collect(); //GC have to be here
+            GC.WaitForPendingFinalizers();
+
+            string charaFile = map.FindFile("chara.one");
+            if(charaFile == "ERR_ERR_ERR") return;
+            byte[] chara = map.GetFile(charaFile);
 
         }
     }

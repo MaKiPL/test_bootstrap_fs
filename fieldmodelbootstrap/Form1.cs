@@ -59,7 +59,9 @@ namespace fieldmodelbootstrap
             string charaFile = map.FindFile("chara.one");
             if(charaFile == "ERR_ERR_ERR") return;
             byte[] chara = map.GetFile(charaFile);
-
+#if DEBUG
+            System.IO.File.WriteAllBytes("D:/Chara.one", chara);
+#endif
         }
     }
 }

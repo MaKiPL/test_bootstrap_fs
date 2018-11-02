@@ -58,10 +58,16 @@ namespace fieldmodelbootstrap
 
             string charaFile = map.FindFile("chara.one");
             if(charaFile == "ERR_ERR_ERR") return;
-            byte[] chara = map.GetFile(charaFile);
-#if DEBUG
-            System.IO.File.WriteAllBytes("D:/Chara.one", chara);
-#endif
+            CharaOne charaOne = new CharaOne(map.GetFile(charaFile));
+            listBox2.DataSource = charaOne.GetNames;
+            if (listBox2.Items.Count == 0)
+            {
+                listBox2.Enabled = false;
+                listBox2.DataSource = new string[] { "BROKEN FILE. ;_;" };
+            }
+            else listBox2.Enabled = true;
+
+            System.IO.File.WriteAllBytes(@"D:/chara.one", charaOne.buffer);
         }
     }
 }

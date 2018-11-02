@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,16 @@ namespace fieldmodelbootstrap
         /// <returns></returns>
         public static string[] ConvertBufferToStringArray(byte[] buffer, Encoding enc)
 => enc.GetString(buffer).Split(new char[] { '\0', '\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
+
+        public static unsafe string GetStringRawBuffer(byte[] buffer, int pointer, int length)
+        {
+            string s = "";
+            fixed(byte* b = buffer)
+                for (int i = 0; i < length; i++)
+                    s += (char)*(b + pointer + i);
+            return s;
+        }
+
 
         public static string getFilename_dirty(string s, char delimiter = '\\')=>
             s.Substring(s.LastIndexOf(delimiter)+1);
